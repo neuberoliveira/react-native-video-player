@@ -130,12 +130,15 @@ export default class VideoPlayer extends Component {
     });
   }
 
-  onStartPress() {
+  onStartPress(event) {
     this.setState({
       isPlaying: true,
       isStarted: true,
     });
-
+    
+    if(this.props.onStartPress)
+      this.props.onStartPress(event);
+    
     this.hideControls();
   }
 
@@ -177,17 +180,34 @@ export default class VideoPlayer extends Component {
     this.setState({ duration });
   }
 
-  onPlayPress() {
+  onPlayPress(event) {
+    var playing = !this.state.isPlaying;
     this.setState({
-      isPlaying: !this.state.isPlaying,
+      isPlaying: playing,
     });
+    
+    if(this.props.onPlayPress)
+      this.props.onPlayPress(event);
+    
+    if(playing){
+      if(this.props.onPlay)
+        this.props.onPlay(event);
+    }else{
+      if(this.props.onPause)
+        this.props.onPause(event);
+    }
+    
     this.showControls();
   }
 
-  onMutePress() {
+  onMutePress(event) {
     this.setState({
       isMuted: !this.state.isMuted,
     });
+    
+    if(this.props.onMutePress)
+      this.props.onMutePress(event);
+    
     this.showControls();
   }
 
@@ -485,6 +505,11 @@ VideoPlayer.propTypes = {
   onEnd: PropTypes.func,
   onProgress: PropTypes.func,
   onLoad: PropTypes.func,
+  onPlay: PropTypes.func,
+  onPause: PropTypes.func,
+  onPlayPress: PropTypes.func,
+  onStartPress: PropTypes.func,
+  onMutePress: PropTypes.func,
 };
 
 VideoPlayer.defaultProps = {
