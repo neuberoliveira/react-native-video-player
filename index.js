@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, Platform } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Video from 'react-native-video'; // eslint-disable-line
 
@@ -89,6 +89,7 @@ export default class VideoPlayer extends Component {
     this.state = {
       isStarted: props.autoplay,
       isPlaying: props.autoplay,
+      isLoading: false,
       width: 200,
       progress: 0,
       isMuted: props.defaultMuted,
@@ -177,7 +178,15 @@ export default class VideoPlayer extends Component {
     }
 
     const { duration } = event;
-    this.setState({ duration });
+    this.setState({duration:duration, isLoading:false});
+  }
+  
+  onLoadStart(event) {
+    if (this.props.onLoadStart) {
+      this.props.onLoadStart(event);
+    }
+
+    this.setState({isLoading:true});
   }
 
   onPlayPress(event) {
@@ -437,6 +446,7 @@ export default class VideoPlayer extends Component {
           ]}
         >
           <TouchableOpacity style={styles.overlayButton} onPress={this.showControls} />
+          {this.renderLoader()}
         </View>
         {((!this.state.isPlaying) || this.state.isControlsVisible)
           ? this.renderControls() : this.renderSeekBar(true)}
@@ -458,6 +468,25 @@ export default class VideoPlayer extends Component {
       );
     }
     return this.renderVideo();
+  }
+  
+  renderLoader(){
+    view = null;
+    if(this.state.isPlaying && this.state.isLoading){
+      view = (
+        <View style={[this.getSizeStyles(), {justifyContent:'center', alignItems:'center'}]}>
+          <ActivityIndicator
+            style={{transform: [{scale: 1.3}]}}
+            animating={true}
+            //color={this.props.color}
+            //size={this.props.size}
+            size={'large'}
+          />
+        </View>
+      );
+    }
+    
+    return view;
   }
 
   render() {
